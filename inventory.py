@@ -33,7 +33,6 @@ def agregar_producto():
     df = cargar_inventario()
     
     print("\n--- Agregar Nuevo Producto ---")
-    nuevo_id = 1 if df.empty else int(df['ID'].max()) + 1
     
     nombre = input("Nombre del producto: ").strip()
     while not nombre:
@@ -42,16 +41,21 @@ def agregar_producto():
     cantidad = pedir_numero("Cantidad: ", es_entero=True)
     precio = pedir_numero("Precio: $", es_entero=False)
     
+    # ID temporal; se reordenará al guardar
     nuevo_registro = pd.DataFrame([{
-        'ID': nuevo_id,
+        'ID': 0,
         'Producto': nombre,
         'Cantidad': cantidad,
         'Precio': precio
     }])
     
     df = pd.concat([df, nuevo_registro], ignore_index=True)
+    
+    # Reordena todos los IDs de 1 a N
+    df['ID'] = range(1, len(df) + 1)
+    
     df.to_excel(ARCHIVO, index=False)
-    print(f"\n¡Producto '{nombre}' (ID: {nuevo_id}) guardado exitosamente en Excel!")
+    print(f"\n¡Producto '{nombre}' guardado exitosamente en Excel!")
 
 def buscar_producto():
     df = cargar_inventario()
@@ -62,7 +66,6 @@ def buscar_producto():
     print("\n--- Buscar Producto ---")
     busqueda = input("Ingresa el nombre o parte del nombre a buscar: ").strip().lower()
     
-    # Busca coincidencias parciales sin importar mayúsculas/minúsculas
     resultado = df[df['Producto'].astype(str).str.lower().str.contains(busqueda)]
     
     if resultado.empty:
@@ -83,11 +86,14 @@ def borrar_producto():
     if id_a_borrar in df['ID'].values:
         nombre = df[df['ID'] == id_a_borrar]['Producto'].values[0]
         
-        # Mantiene solo las filas que NO coincidan con el ID a eliminar
+        # Elimina la fila seleccionada
         df = df[df['ID'] != id_a_borrar]
         
+        # Reordena los IDs de las filas restantes de 1 a N
+        df['ID'] = range(1, len(df) + 1)
+        
         df.to_excel(ARCHIVO, index=False)
-        print(f"\n¡Producto '{nombre}' (ID: {id_a_borrar}) eliminado correctamente de Excel!")
+        print(f"\n¡Producto '{nombre}' eliminado. La lista se reordenó consecutivamente en Excel!")
     else:
         print(f"¡Error! No existe ningún producto con el ID {id_a_borrar}.")
 
