@@ -33,7 +33,9 @@ def agregar_producto():
     df = cargar_inventario()
     
     print("\n--- Agregar Nuevo Producto ---")
-    nuevo_id = len(df) + 1
+    
+    # Garantizar ID único buscando el valor máximo actual
+    nuevo_id = 1 if df.empty else int(df['ID'].max()) + 1
     
     # Validar que el nombre no quede vacío
     nombre = input("Nombre del producto: ").strip()
@@ -53,7 +55,7 @@ def agregar_producto():
     
     df = pd.concat([df, nuevo_registro], ignore_index=True)
     df.to_excel(ARCHIVO, index=False)
-    print(f"\n¡Producto '{nombre}' guardado exitosamente en Excel!")
+    print(f"\n¡Producto '{nombre}' (ID: {nuevo_id}) guardado exitosamente en Excel!")
 
 # --- Menú Principal ---
 while True:
