@@ -1,9 +1,13 @@
-# Interactive inventory calculator
-product = input("Product name: ")
-quantity = int(input("Quantity in stock: "))
-unit_price = float(input("Unit price ($): "))
+import pandas as pd
 
-total_value = quantity * unit_price
+# 1. Cargar el archivo Excel
+df = pd.read_excel("inventario.xlsx")
 
-print("----------------------------------------")
-print(f"Total inventory value for {product}: ${total_value:.2f}")
+# 2. Mostrar la tabla completa
+print("--- Inventario Completo ---")
+print(df)
+
+# 3. Filtrar productos con menos de 10 unidades
+print("\n--- Alerta de Reabastecimiento (Stock < 10) ---")
+stock_bajo = df[df['Cantidad'] < 10]
+print(stock_bajo)
